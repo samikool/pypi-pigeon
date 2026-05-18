@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info
+.venv
+
+# uv
+.python-version
+uv.lock
+
+# Claude Code
+CLAUDE.md
+
+# Editor
+.vscode/
+
+# Runtime / generated data
+size_estimate_checkpoint.json
+supplement/dist/

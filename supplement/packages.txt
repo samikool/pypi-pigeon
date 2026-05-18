@@ -1,0 +1,14 @@
+# Packages to include in the curated supplement.
+# Standard requirements.txt format — pin versions if you need specific ones.
+# Run: uv run supplement/download.py
+#
+# Examples:
+# requests
+# numpy==1.24.3
+# pandas>=2.0,<2.1
+markitdown
+networkx
+matplotlib
+scapy
+rich
+
