@@ -1,8 +1,8 @@
 # Python
 __pycache__/
 *.py[oc]
-*.egg-info
-.venv
+*.egg-info/
+.venv/
 
 # uv
 .python-version
@@ -14,6 +14,13 @@ CLAUDE.md
 # Editor
 .vscode/
 
-# Runtime / generated data
-size_estimate_checkpoint.json
+# User config and generated files (user-specific; not shared)
+pymirror.toml
+bandersnatch.conf
+
+# Runtime artifacts
+pymirror_dryrun_checkpoint.json
 supplement/dist/
+
+# Build
+dist/

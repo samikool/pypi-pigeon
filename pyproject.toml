@@ -1,10 +1,16 @@
 [project]
 name = "pymirror"
 version = "0.1.0"
-description = "Add your description here"
+description = "TUI toolkit for maintaining a PyPI mirror on an airgapped network"
 requires-python = ">=3.12"
 dependencies = [
     "bandersnatch>=7.1.0",
-    "pip",
-    "rich",
+    "textual>=0.80.0",
 ]
+
+[project.scripts]
+pymirror = "pymirror.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
