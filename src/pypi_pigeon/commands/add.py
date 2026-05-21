@@ -1,4 +1,4 @@
-"""pymirror add — append packages to the supplement list."""
+"""pigeon add — append packages to the supplement list."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,7 +30,7 @@ def add_packages(packages: list[str], packages_file: Path) -> None:
     print()
     if to_add:
         print(f"{len(to_add)} package(s) added to {packages_file}")
-        print("These will be fetched with full dependency resolution during `pymirror sync`.")
+        print("These will be fetched with full dependency resolution during `pigeon sync`.")
         print("Every transitive dependency is resolved and downloaded as a wheel — no surprises on the airgapped side.")
     else:
         print(f"Nothing new — all packages already in {packages_file}")

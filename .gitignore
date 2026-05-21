@@ -15,11 +15,11 @@ CLAUDE.md
 .vscode/
 
 # User config and generated files (user-specific; not shared)
-pymirror.toml
+pigeon.toml
 bandersnatch.conf
 
 # Runtime artifacts
-pymirror_dryrun_checkpoint.json
+pigeon_dryrun_checkpoint.json
 supplement/dist/
 
 # Build

@@ -1,4 +1,4 @@
-"""pymirror dry-run — fetch PyPI metadata to estimate mirror size before committing to a full sync."""
+"""pigeon dry-run — fetch PyPI metadata to estimate mirror size before committing to a full sync."""
 from __future__ import annotations
 
 import heapq
@@ -16,9 +16,9 @@ from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import DataTable, Footer, Header, Label, ProgressBar, Rule, Static
 
-from pymirror.config import Config, PYPI_MASTER, allowlist_patterns
+from pypi_pigeon.config import Config, PYPI_MASTER, allowlist_patterns
 
-CHECKPOINT_FILE = Path("pymirror_dryrun_checkpoint.json")
+CHECKPOINT_FILE = Path("pigeon_dryrun_checkpoint.json")
 DEFAULT_WORKERS = 50
 LEADERBOARD_SIZE = 20
 _FLUSH_INTERVAL = 0.2
@@ -218,7 +218,7 @@ Screen { height: 100vh; }
 
 class DryRunApp(App):
     CSS = CSS
-    TITLE = "pymirror — dry run"
+    TITLE = "pigeon — dry run"
     BINDINGS = [
         Binding("s", "go_sync", "Run sync now", show=False),
         Binding("q", "go_quit", "Quit"),

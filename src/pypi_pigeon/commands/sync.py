@@ -1,4 +1,4 @@
-"""pymirror sync — run bandersnatch mirror with a live TUI."""
+"""pigeon sync — run bandersnatch mirror with a live TUI."""
 from __future__ import annotations
 
 import asyncio
@@ -14,8 +14,8 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Label, ProgressBar, RichLog, Static
 
-from pymirror.config import Config, pip_download_cmd
-from pymirror.commands.dry_run import CHECKPOINT_FILE, fmt, load_checkpoint
+from pypi_pigeon.config import Config, pip_download_cmd
+from pypi_pigeon.commands.dry_run import CHECKPOINT_FILE, fmt, load_checkpoint
 
 def _bandersnatch_cmd(config: Config) -> list[str]:
     conf = config.config_dir / "bandersnatch.conf"
@@ -150,7 +150,7 @@ class DryRunReminderScreen(Screen):
             with Vertical(id="reminder-panel"):
                 yield Static(
                     "No dry-run data found.\n\n"
-                    "Tip: [bold]pymirror dry-run[/bold] fetches mirror metadata to give you a size estimate "
+                    "Tip: [bold]pigeon dry-run[/bold] fetches mirror metadata to give you a size estimate "
                     "before committing. Takes hours — but mirroring takes days.\n\n"
                     "Press [bold]S[/bold] to sync now, or [bold]D[/bold] to dry-run first.",
                     id="reminder-body",
@@ -388,7 +388,7 @@ class SyncDoneScreen(Screen):
                 "DTA to the airgapped server:\n"
                 "  [bold]<mirror-dir>/web/[/bold]        — base mirror\n"
                 "  [bold]supplement/dist/[/bold]         — supplement wheels (if any)\n\n"
-                "Then run [bold]pymirror merge[/bold] on the server to fold the supplement wheels into the mirror.\n\n"
+                "Then run [bold]pigeon merge[/bold] on the server to fold the supplement wheels into the mirror.\n\n"
                 "Press [bold]Q[/bold] to quit.",
                 id="done-text",
             )
@@ -402,7 +402,7 @@ class SyncDoneScreen(Screen):
 
 class SyncApp(App):
     CSS = CSS
-    TITLE = "pymirror — sync"
+    TITLE = "pigeon — sync"
     BINDINGS = [Binding("ctrl+c", "quit", "Quit")]
 
     def __init__(self, config: Config) -> None:

@@ -1,4 +1,4 @@
-"""pymirror merge — fold supplement/dist/ into the mirror with a live TUI."""
+"""pigeon merge — fold supplement/dist/ into the mirror with a live TUI."""
 from __future__ import annotations
 
 import hashlib
@@ -12,7 +12,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import Footer, Header, RichLog, Static
 
-from pymirror.config import Config
+from pypi_pigeon.config import Config
 
 CSS = """
 Screen { height: 100vh; }
@@ -102,7 +102,7 @@ def _merge_core(
 
     if not dist_dir.exists():
         log(f"[bold red]Error:[/bold red] supplement dist dir not found: {dist_dir}")
-        log("Run [bold]pymirror sync[/bold] (internet side) and DTA the dist folder over first.")
+        log("Run [bold]pigeon sync[/bold] (internet side) and DTA the dist folder over first.")
         status("[red]Failed — dist dir not found.[/red]")
         return
 
@@ -176,7 +176,7 @@ def run_headless(config: Config) -> None:
 
 class MergeApp(App):
     CSS = CSS
-    TITLE = "pymirror — merge"
+    TITLE = "pigeon — merge"
     BINDINGS = [Binding("q", "go_quit", "Quit")]
 
     def __init__(self, config: Config) -> None:

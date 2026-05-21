@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-pymirror — TUI toolkit for maintaining a PyPI mirror on an airgapped network.
+pigeon — TUI toolkit for maintaining a PyPI mirror on an airgapped network.
 
 Commands:
   setup     Wizard: configure mirror and generate bandersnatch.conf
@@ -17,14 +17,14 @@ from pathlib import Path
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="pymirror",
+        prog="pigeon",
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "--config", type=Path, default=None,
         metavar="PATH",
-        help="path to pymirror.toml (default: search up from current directory)",
+        help="path to pigeon.toml (default: search up from current directory)",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -58,16 +58,16 @@ def main() -> None:
 
 
 def _load_config(config_path: Path | None):
-    from pymirror.config import load, find_config
+    from pypi_pigeon.config import load, find_config
     if config_path is None:
         config_path = find_config()
         if config_path is None:
-            print("No pymirror.toml found — run `pymirror setup` first.")
+            print("No pigeon.toml found — run `pigeon setup` first.")
             sys.exit(1)
     try:
         return load(config_path)
     except FileNotFoundError:
-        print(f"No config found at {config_path} — run `pymirror setup` first.")
+        print(f"No config found at {config_path} — run `pigeon setup` first.")
         sys.exit(1)
 
 
@@ -80,8 +80,8 @@ def _run(args, command: str) -> None:
         next_cmd = None
 
         if cmd == "setup":
-            from pymirror.config import DEFAULT_CONFIG_PATH, find_config
-            from pymirror.commands.setup import SetupApp
+            from pypi_pigeon.config import DEFAULT_CONFIG_PATH, find_config
+            from pypi_pigeon.commands.setup import SetupApp
             config_path = args.config or find_config() or DEFAULT_CONFIG_PATH
             app = SetupApp(config_path=config_path)
             app.run(inline=True)
@@ -92,10 +92,10 @@ def _run(args, command: str) -> None:
             workers = getattr(args, "workers", None) or config.supplement.fetch_workers
             reset = getattr(args, "reset", False)
             if getattr(args, "plain", False):
-                from pymirror.commands.dry_run import run_headless
+                from pypi_pigeon.commands.dry_run import run_headless
                 run_headless(config, workers=workers, reset=reset)
             else:
-                from pymirror.commands.dry_run import DryRunApp
+                from pypi_pigeon.commands.dry_run import DryRunApp
                 app = DryRunApp(config=config, workers=workers, reset=reset)
                 app.run(inline=True)
                 next_cmd = app.next_command
@@ -103,10 +103,10 @@ def _run(args, command: str) -> None:
         elif cmd in ("sync", "mirror"):
             config = _load_config(args.config)
             if getattr(args, "plain", False):
-                from pymirror.commands.sync import run_headless
+                from pypi_pigeon.commands.sync import run_headless
                 run_headless(config)
             else:
-                from pymirror.commands.sync import SyncApp
+                from pypi_pigeon.commands.sync import SyncApp
                 app = SyncApp(config=config)
                 app.run(inline=True)
                 next_cmd = app.next_command
@@ -114,17 +114,17 @@ def _run(args, command: str) -> None:
         elif cmd == "merge":
             config = _load_config(args.config)
             if getattr(args, "plain", False):
-                from pymirror.commands.merge import run_headless
+                from pypi_pigeon.commands.merge import run_headless
                 run_headless(config)
             else:
-                from pymirror.commands.merge import MergeApp
+                from pypi_pigeon.commands.merge import MergeApp
                 app = MergeApp(config=config)
                 app.run(inline=True)
                 next_cmd = app.next_command
 
         elif cmd == "add":
             config = _load_config(args.config)
-            from pymirror.commands.add import add_packages
+            from pypi_pigeon.commands.add import add_packages
             add_packages(args.packages, config.resolve(config.supplement.packages_file))
             next_cmd = None
 

@@ -1,4 +1,4 @@
-"""pymirror setup — step-by-step wizard."""
+"""pigeon setup — step-by-step wizard."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -9,7 +9,7 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, ContentSwitcher, Footer, Header, Input, Label, Select, SelectionList, Static
 
-from pymirror.config import (
+from pypi_pigeon.config import (
     Config,
     DEFAULT_CONFIG_PATH,
     KNOWN_PLATFORMS,
@@ -23,7 +23,7 @@ from pymirror.config import (
 STEPS = [
     (
         "welcome",
-        "Welcome to pymirror",
+        "Welcome to pigeon",
         "This wizard configures your PyPI mirror and generates [bold]bandersnatch.conf[/bold].\n\n"
         "Press [bold]Next →[/bold] to begin.",
         None,
@@ -113,14 +113,14 @@ STEPS = [
         "dist_dir",
         "Supplement dist directory",
         "Where DTA'd supplement wheels are placed on the server\n"
-        "before running [bold]pymirror merge[/bold].",
+        "before running [bold]pigeon merge[/bold].",
         "supplement.dist_dir",
         "text",
     ),
     (
         "confirm",
         "Review & confirm",
-        "Press [bold]Finish ✓[/bold] to write [bold]pymirror.toml[/bold] and [bold]bandersnatch.conf[/bold].",
+        "Press [bold]Finish ✓[/bold] to write [bold]pigeon.toml[/bold] and [bold]bandersnatch.conf[/bold].",
         None,
         "confirm",
     ),
@@ -428,15 +428,15 @@ class DoneScreen(Screen):
         with Vertical(id="done-panel"):
             yield Static(
                 "[bold green]Setup complete![/bold green]\n\n"
-                f"  [bold]{self._config_path}[/bold]   — pymirror config\n"
+                f"  [bold]{self._config_path}[/bold]   — pigeon config\n"
                 f"  [bold]{self._conf_path}[/bold]  — bandersnatch config\n\n"
-                "Run [bold]pymirror dry-run[/bold] to preview mirror size before syncing.\n\n"
+                "Run [bold]pigeon dry-run[/bold] to preview mirror size before syncing.\n\n"
                 "[bold]Need specific packages?[/bold]\n"
-                "Run [bold]pymirror add <pkg>[/bold] or edit [bold]supplement/packages.txt[/bold] directly.\n"
+                "Run [bold]pigeon add <pkg>[/bold] or edit [bold]supplement/packages.txt[/bold] directly.\n"
                 "Unlike the base mirror, these are fetched with full dependency resolution —\n"
                 "every transitive dependency is resolved and downloaded as a wheel,\n"
                 "so you are guaranteed a self-contained closure on the airgapped side.\n"
-                "They are fetched automatically as part of [bold]pymirror sync[/bold].\n\n"
+                "They are fetched automatically as part of [bold]pigeon sync[/bold].\n\n"
                 "Press [bold]E[/bold] to dry-run now, [bold]Q[/bold] to quit.",
                 id="done-text",
             )
@@ -452,14 +452,14 @@ class DoneScreen(Screen):
 
 class SetupApp(App):
     CSS = CSS
-    TITLE = "pymirror — setup"
+    TITLE = "pigeon — setup"
 
     def __init__(self, config_path: Path = DEFAULT_CONFIG_PATH) -> None:
         super().__init__()
         self.config_path = config_path
         self.next_command: str | None = None
         try:
-            from pymirror.config import load
+            from pypi_pigeon.config import load
             config = load(config_path)
         except FileNotFoundError:
             config = Config()

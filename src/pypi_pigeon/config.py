@@ -1,7 +1,7 @@
 """
-Single source of truth for pymirror configuration.
+Single source of truth for pypi-pigeon configuration.
 
-Reads/writes pymirror.toml. Also owns bandersnatch.conf generation so the
+Reads/writes pigeon.toml. Also owns bandersnatch.conf generation so the
 allowlist patterns are defined in exactly one place.
 
 The split between Config (user intent) and generate_bandersnatch_conf()
@@ -15,15 +15,15 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
-DEFAULT_CONFIG_PATH = Path("pymirror.toml")
+DEFAULT_CONFIG_PATH = Path("pigeon.toml")
 PYPI_MASTER = "https://pypi.org"
 
 
 def find_config(start: Path | None = None) -> Path | None:
-    """Walk up from start (default: cwd) looking for pymirror.toml, git-style."""
+    """Walk up from start (default: cwd) looking for pigeon.toml, git-style."""
     here = (start or Path.cwd()).resolve()
     for directory in [here, *here.parents]:
-        candidate = directory / "pymirror.toml"
+        candidate = directory / "pigeon.toml"
         if candidate.exists():
             return candidate
     return None
@@ -95,7 +95,7 @@ class FilterConfig:
 @dataclass
 class SupplementConfig:
     dist_dir: str = "supplement/dist"
-    packages_file: str = "supplement/packages.txt"
+    packages_file: str = "requirements.txt"
     fetch_workers: int = 50
 
 
