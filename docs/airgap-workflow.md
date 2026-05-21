@@ -131,12 +131,23 @@ cat /your/mirror/last-sync-diff.txt
 
 ---
 
-## pigeon-merge.py path auto-detection
+## Recommended server layout
 
-If you keep `pigeon.toml` on the server alongside the merge script, you can omit the explicit flags:
+The simplest server setup is to copy your entire pigeon workspace (the folder where you ran `pigeon setup` and where `pigeon.toml` lives) to the server on your first transfer. Drop it somewhere permanent:
 
-```bash
-python3 /opt/pigeon/pigeon-merge.py   # reads paths from pigeon.toml automatically
+```
+/opt/pigeon/
+  pigeon.toml           ← your config, already has the right paths
+  pigeon-merge.py       ← the standalone merge script
+  requirements.txt      ← your supplement package list
+  supplement/
+    dist/               ← wheels accumulate here across transfers
 ```
 
-The script walks up the directory tree from wherever it's run, looking for `pigeon.toml` — the same way the `pigeon` CLI does.
+With this layout, `pigeon-merge.py` finds `pigeon.toml` automatically via walk-up discovery and you never need to pass explicit flags:
+
+```bash
+python3 /opt/pigeon/pigeon-merge.py
+```
+
+The script walks up the directory tree from wherever it's run looking for `pigeon.toml`, the same way the `pigeon` CLI does. If your mirror paths in `pigeon.toml` are absolute (which they will be if you ran `pigeon setup`), the config is valid on the server without any changes.
