@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.0] — 2026-05-20
+
+### Added
+- `pigeon status` — show mirror health at a glance: package count, last sync time, cached supplement wheels, and an outdated check against PyPI
+- `pigeon update` — full sync pipeline (alias for `pigeon sync` with update framing); `--check` flag checks for outdated supplement packages without syncing; `--plain` for scripting
+
+### Removed
+- `fetch_workers` from `pigeon.toml` — the field was not wired to anything; `pip download` manages its own concurrency
+
 ## [0.1.0] — 2026-05-20
 
 ### Added

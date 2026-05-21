@@ -4,6 +4,8 @@ A toolkit for maintaining a PyPI mirror on an airgapped network. Packages are br
 
 Uses [bandersnatch](https://bandersnatch.readthedocs.io/) for the base mirror and a supplement workflow for packages that need full dependency resolution. Features a Textual TUI for interactive use and `--plain` mode for scripting.
 
+**Running in a true airgap?** See [docs/airgap-workflow.md](docs/airgap-workflow.md) for the full operational workflow — including one-time server setup, the security-wipe transfer model, and `pigeon-merge.py`, a standalone merge script that runs on the airgapped server with no dependencies beyond Python 3.6.
+
 ## Install
 
 ```bash
@@ -30,9 +32,11 @@ DTA the following to your airgapped server:
 
 ```bash
 pigeon merge      # fold supplement wheels into the mirror's simple/ index
+# or on servers without pigeon installed:
+python3 pigeon-merge.py --mirror /your/mirror --dist supplement/dist
 ```
 
-Re-run `pigeon merge` after every bandersnatch sync — bandersnatch overwrites `simple/<pkg>/index.html` for packages it manages, wiping supplement links for those packages. Merge is idempotent and fast.
+Re-run after every sync — bandersnatch overwrites `simple/<pkg>/index.html` for packages it manages, wiping supplement links for those packages. Both merge commands are idempotent and fast.
 
 ## Commands
 
@@ -42,8 +46,10 @@ Re-run `pigeon merge` after every bandersnatch sync — bandersnatch overwrites 
 | `pigeon dry-run` | Fetch PyPI metadata to estimate mirror size before syncing |
 | `pigeon sync` | Run bandersnatch + fetch supplement packages |
 | `pigeon mirror` | Alias for `sync` (bandersnatch's own term) |
+| `pigeon update` | Alias for `sync` with update framing; `--check` checks supplement packages for newer versions without syncing |
 | `pigeon merge` | Fold `supplement/dist/` into the mirror's `simple/` index |
 | `pigeon add <pkg>` | Append packages to the supplement list |
+| `pigeon status` | Show mirror health — package count, last sync time, cached wheels, and an outdated check against PyPI |
 
 **`--plain` flag** — add to `dry-run`, `sync`/`mirror`, or `merge` to stream plain stdout instead of launching the TUI. Useful for scripting and CI.
 
