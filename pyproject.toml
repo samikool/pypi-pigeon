@@ -19,8 +19,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/samikool/pymirror"
-"Bug Tracker" = "https://github.com/samikool/pymirror/issues"
+Homepage = "https://github.com/samikool/pypi-pigeon"
+"Bug Tracker" = "https://github.com/samikool/pypi-pigeon/issues"
 
 [project.scripts]
 pigeon = "pypi_pigeon.cli:main"

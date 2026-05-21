@@ -3,7 +3,7 @@
 ## Setup
 
 ```bash
-git clone https://github.com/samikool/pymirror
+git clone https://github.com/samikool/pypi-pigeon
 cd pymirror
 uv sync --dev
 ```
