@@ -9,29 +9,32 @@ In a proper airgap setup, the transfer media (USB drive, external HDD, etc.) is 
 Because of this, the workflow is split into two sides:
 
 - **Internet machine** — runs `pigeon sync`, writes new files to the drive
-- **Airgapped server** — reads from the drive, copies to the mirror, runs `pigeon-merge.py`, drive is wiped
+- **Airgapped server** — reads from the drive, rsyncs everything into place, runs `pigeon-merge.py`, drive is wiped
 
-The supplement wheels are **not** wiped on the server side. They accumulate in a permanent directory. `pigeon-merge.py` is idempotent — re-merging a wheel that's already in the index is a no-op.
+The supplement wheels are **not** wiped on the server side. They accumulate in `/opt/pigeon/supplement/dist/` across transfers. `pigeon-merge.py` is idempotent — re-merging a wheel that's already in the index is a no-op.
+
+---
+
+## Recommended server layout
+
+Copy your entire pigeon workspace to `/opt/pigeon/` on the server and keep it there permanently. This is the folder where you ran `pigeon setup` on the internet side:
+
+```
+/opt/pigeon/
+  pigeon.toml           ← your config, already has the right paths
+  pigeon-merge.py       ← the standalone merge script
+  requirements.txt      ← your supplement package list
+  supplement/
+    dist/               ← wheels accumulate here across transfers
+```
+
+With this layout, `pigeon-merge.py` finds `pigeon.toml` automatically and you never need to pass explicit flags. The server needs no Python packages installed — just Python 3.6+ which is already present on any modern Linux system.
 
 ---
 
 ## One-time server setup
 
-Do this once when you first set up the server.
-
-```bash
-# Pick a permanent home for the standalone merge script and supplement wheels
-mkdir -p /opt/pigeon/supplement/dist
-
-# Copy pigeon-merge.py from the transfer drive
-cp /mnt/transfer/pigeon-merge.py /opt/pigeon/pigeon-merge.py
-```
-
-That's it. The server needs no Python packages installed — just Python 3.6+ which is already present on any modern Linux system.
-
----
-
-## First transfer (initial mirror setup)
+On your first transfer, copy the full workspace onto the drive and drop it on the server:
 
 **On the internet machine:**
 
@@ -41,32 +44,29 @@ pigeon add requests numpy <any other packages>   # optional supplement packages
 pigeon sync       # run bandersnatch + fetch supplement wheels
 ```
 
-Plug in the transfer drive and copy the mirror onto it:
+Plug in the transfer drive:
 
 ```bash
 # Copy the full mirror (this is large — plan for it)
 rsync -av /your/mirror/web/    /mnt/transfer/web/
-rsync -av supplement/dist/     /mnt/transfer/supplement/dist/
 
-# Also copy the merge script if you haven't already
-cp pigeon-merge.py /mnt/transfer/pigeon-merge.py
+# Copy the entire pigeon workspace
+rsync -av /your/pigeon-workspace/  /mnt/transfer/pigeon/
 ```
 
-Unplug drive. Walk it to the server.
+Unplug. Walk it to the server.
 
 **On the airgapped server:**
 
 ```bash
 # Copy mirror to the share
-rsync -av /mnt/transfer/web/              /share/pypimirror/web/
+rsync -av /mnt/transfer/web/     /share/pypimirror/web/
 
-# Copy supplement wheels to the permanent directory
-rsync -av /mnt/transfer/supplement/dist/  /opt/pigeon/supplement/dist/
+# Copy the pigeon workspace to its permanent home
+rsync -av /mnt/transfer/pigeon/  /opt/pigeon/
 
 # Fold supplement wheels into the mirror index
-python3 /opt/pigeon/pigeon-merge.py \
-    --mirror /share/pypimirror \
-    --dist   /opt/pigeon/supplement/dist
+python3 /opt/pigeon/pigeon-merge.py
 ```
 
 Wipe the drive. nginx serves immediately — no restart needed.
@@ -74,6 +74,8 @@ Wipe the drive. nginx serves immediately — no restart needed.
 ---
 
 ## Regular update cycle
+
+Every subsequent transfer follows the same pattern — copy the whole workspace, copy the mirror, merge.
 
 **On the internet machine:**
 
@@ -88,9 +90,8 @@ pigeon sync
 Plug in the (freshly wiped) transfer drive:
 
 ```bash
-# Sync only what changed — bandersnatch is incremental so this is fast
-rsync -av /your/mirror/web/    /mnt/transfer/web/
-rsync -av supplement/dist/     /mnt/transfer/supplement/dist/
+rsync -av /your/mirror/web/        /mnt/transfer/web/
+rsync -av /your/pigeon-workspace/  /mnt/transfer/pigeon/
 ```
 
 Unplug. Walk it over.
@@ -98,15 +99,15 @@ Unplug. Walk it over.
 **On the airgapped server:**
 
 ```bash
-rsync -av /mnt/transfer/web/              /share/pypimirror/web/
-rsync -av /mnt/transfer/supplement/dist/  /opt/pigeon/supplement/dist/
+rsync -av /mnt/transfer/web/     /share/pypimirror/web/
+rsync -av /mnt/transfer/pigeon/  /opt/pigeon/
 
-python3 /opt/pigeon/pigeon-merge.py \
-    --mirror /share/pypimirror \
-    --dist   /opt/pigeon/supplement/dist
+python3 /opt/pigeon/pigeon-merge.py
 ```
 
 Wipe the drive.
+
+Always copying the full workspace means you never have to think about what changed — `pigeon.toml`, `requirements.txt`, `pigeon-merge.py`, and any new supplement wheels all stay in sync automatically.
 
 ---
 
@@ -128,26 +129,3 @@ diff_file = "/your/mirror/last-sync-diff.txt"
 ```bash
 cat /your/mirror/last-sync-diff.txt
 ```
-
----
-
-## Recommended server layout
-
-The simplest server setup is to copy your entire pigeon workspace (the folder where you ran `pigeon setup` and where `pigeon.toml` lives) to the server on your first transfer. Drop it somewhere permanent:
-
-```
-/opt/pigeon/
-  pigeon.toml           ← your config, already has the right paths
-  pigeon-merge.py       ← the standalone merge script
-  requirements.txt      ← your supplement package list
-  supplement/
-    dist/               ← wheels accumulate here across transfers
-```
-
-With this layout, `pigeon-merge.py` finds `pigeon.toml` automatically via walk-up discovery and you never need to pass explicit flags:
-
-```bash
-python3 /opt/pigeon/pigeon-merge.py
-```
-
-The script walks up the directory tree from wherever it's run looking for `pigeon.toml`, the same way the `pigeon` CLI does. If your mirror paths in `pigeon.toml` are absolute (which they will be if you ran `pigeon setup`), the config is valid on the server without any changes.
