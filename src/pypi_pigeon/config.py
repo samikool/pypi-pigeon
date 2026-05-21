@@ -96,7 +96,6 @@ class FilterConfig:
 class SupplementConfig:
     dist_dir: str = "supplement/dist"
     packages_file: str = "requirements.txt"
-    fetch_workers: int = 50
 
 
 @dataclass
@@ -158,7 +157,6 @@ def save(config: Config, path: Path = DEFAULT_CONFIG_PATH) -> None:
         "[supplement]",
         f'dist_dir = "{s.dist_dir}"',
         f'packages_file = "{s.packages_file}"',
-        f"fetch_workers = {s.fetch_workers}",
         "",
     ]
     path.write_text("\n".join(lines))
