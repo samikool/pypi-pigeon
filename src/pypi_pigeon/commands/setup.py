@@ -7,7 +7,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, ContentSwitcher, Footer, Header, Input, Label, Select, SelectionList, Static
+from textual.widgets import Button, ContentSwitcher, Footer, Header, Input, Select, SelectionList, Static
 
 from pypi_pigeon.config import (
     Config,

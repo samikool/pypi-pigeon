@@ -6,7 +6,6 @@ import os
 import re
 import sys
 import time
-from pathlib import Path
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
