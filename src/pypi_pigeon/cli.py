@@ -7,8 +7,10 @@ Commands:
   dry-run   Fetch PyPI metadata to preview mirror size (hits PyPI — needs internet)
   sync      Run bandersnatch mirror + fetch supplement packages (needs internet)
   mirror    Alias for sync (bandersnatch uses this term)
+  update    Sync mirror and supplement packages (alias for sync with update framing)
   merge     Fold supplement/dist/ into the served mirror (airgapped server)
   add       Add packages to the supplement list (fetched with full dep resolution during sync)
+  status    Show mirror health and check supplement packages for updates
 """
 import argparse
 import sys
@@ -47,11 +49,19 @@ def main() -> None:
     p_merge.add_argument("--plain", action="store_true",
                          help="stream output to stdout without TUI")
 
+    p_update = sub.add_parser("update", help="sync mirror and supplement packages")
+    p_update.add_argument("--check", action="store_true",
+                          help="check for outdated supplement packages without syncing")
+    p_update.add_argument("--plain", action="store_true",
+                          help="stream output to stdout without TUI")
+
     p_add = sub.add_parser("add", help="add packages to the supplement list")
     p_add.add_argument(
         "packages", nargs="+", metavar="PACKAGE",
         help="package names to track (e.g. requests 'numpy==1.26.0')",
     )
+
+    sub.add_parser("status", help="show mirror health and check supplement packages for updates")
 
     args = parser.parse_args()
     _run(args, args.command)
@@ -89,7 +99,7 @@ def _run(args, command: str) -> None:
 
         elif cmd == "dry-run":
             config = _load_config(args.config)
-            workers = getattr(args, "workers", None) or config.supplement.fetch_workers
+            workers = getattr(args, "workers", None)
             reset = getattr(args, "reset", False)
             if getattr(args, "plain", False):
                 from pypi_pigeon.commands.dry_run import run_headless
@@ -122,11 +132,25 @@ def _run(args, command: str) -> None:
                 app.run(inline=True)
                 next_cmd = app.next_command
 
+        elif cmd == "update":
+            config = _load_config(args.config)
+            if getattr(args, "check", False):
+                from pypi_pigeon.commands.update import run_check
+                run_check(config)
+            else:
+                from pypi_pigeon.commands.update import run_update
+                run_update(config, plain=getattr(args, "plain", False))
+
         elif cmd == "add":
             config = _load_config(args.config)
             from pypi_pigeon.commands.add import add_packages
             add_packages(args.packages, config.resolve(config.supplement.packages_file))
             next_cmd = None
+
+        elif cmd == "status":
+            config = _load_config(args.config)
+            from pypi_pigeon.commands.status import run_status
+            run_status(config)
 
 
 if __name__ == "__main__":
