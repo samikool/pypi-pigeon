@@ -11,4 +11,5 @@ networkx
 matplotlib
 scapy
 rich
+notebook
 

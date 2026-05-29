@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0] — 2026-05-28
+
+### Added
+- `pigeon download` — new command to fetch supplement packages without running a full mirror sync; supports `--plain` flag for scripted use
+
+### Fixed
+- Supplement package downloads now correctly evaluate Python environment markers (e.g. `python_version < "3.11"`) against the target Python version rather than the internet machine's interpreter. Previously, conditional dependencies like `exceptiongroup` (required by `anyio` on Python < 3.11) were silently skipped, causing `pip install` failures on the airgapped server. Fix: invoke pip via `uv run --no-project --python <version>` so marker evaluation uses the actual target Python.
+
 ## [0.2.0] — 2026-05-20
 
 ### Added
