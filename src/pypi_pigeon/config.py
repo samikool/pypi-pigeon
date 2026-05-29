@@ -178,16 +178,20 @@ PLATFORM_PIP_TAGS: dict[str, str] = {
 
 
 def pip_download_cmd(config: Config) -> list[str]:
-    """Build a `pip download` command targeting the first configured python version + platform."""
+    """Build a pip download command targeting the first configured python version + platform.
+
+    Invoked via `uv run --python <version>` so that environment markers (e.g.
+    `python_version < "3.11"`) are evaluated against the actual target Python, not
+    whatever interpreter happens to be on PATH.  Bare `pip download --python-version`
+    only affects wheel tag selection; it does not fix marker evaluation.
+    """
     version = config.filter.python_versions[0]
     platform = config.filter.platforms[0]
-    py_nodot = version.replace(".", "")
     pip_tag = PLATFORM_PIP_TAGS.get(platform, platform)
     return [
+        "uv", "run", "--no-project", "--python", version, "--with", "pip",
         "pip", "download",
-        "--python-version", py_nodot,
         "--platform", pip_tag,
-        "--abi", f"cp{py_nodot}",
         "--only-binary", ":all:",
         "-d", str(config.resolve(config.supplement.dist_dir)),
         "-r", str(config.resolve(config.supplement.packages_file)),
