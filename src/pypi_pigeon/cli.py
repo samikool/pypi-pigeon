@@ -8,6 +8,7 @@ Commands:
   sync      Run bandersnatch mirror + fetch supplement packages (needs internet)
   mirror    Alias for sync (bandersnatch uses this term)
   update    Sync mirror and supplement packages (alias for sync with update framing)
+  download  Fetch supplement packages without running a full mirror sync
   merge     Fold supplement/dist/ into the served mirror (airgapped server)
   add       Add packages to the supplement list (fetched with full dep resolution during sync)
   status    Show mirror health and check supplement packages for updates
@@ -44,6 +45,10 @@ def main() -> None:
         _p = sub.add_parser(_name, help="run bandersnatch mirror with live TUI" if _name == "sync" else "alias for sync")
         _p.add_argument("--plain", action="store_true",
                         help="stream output to stdout without TUI")
+
+    p_download = sub.add_parser("download", help="fetch supplement packages without a full mirror sync")
+    p_download.add_argument("--plain", action="store_true",
+                            help="stream output to stdout without TUI")
 
     p_merge = sub.add_parser("merge", help="fold supplement/dist/ into the mirror")
     p_merge.add_argument("--plain", action="store_true",
@@ -118,6 +123,17 @@ def _run(args, command: str) -> None:
             else:
                 from pypi_pigeon.commands.sync import SyncApp
                 app = SyncApp(config=config)
+                app.run(inline=True)
+                next_cmd = app.next_command
+
+        elif cmd == "download":
+            config = _load_config(args.config)
+            if getattr(args, "plain", False):
+                from pypi_pigeon.commands.download import run_headless
+                run_headless(config)
+            else:
+                from pypi_pigeon.commands.download import DownloadApp
+                app = DownloadApp(config=config)
                 app.run(inline=True)
                 next_cmd = app.next_command
 
